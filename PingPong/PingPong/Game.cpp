@@ -104,8 +104,7 @@ void CGame::InitGame()
 	InitWindow(nCmdShow);
 	InitDirectX();
 	InitGInput(G_hWnd);
-	if (!InitKeyboard(G_hWnd))
-		MessageBox(G_hWnd, "Cannot initilalize the keyboard", "Error", MB_OK | MB_ICONERROR);
+	InitKeyboard(G_hWnd);
 	LoadResources(G_Device);
 }
 
