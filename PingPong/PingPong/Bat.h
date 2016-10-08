@@ -17,7 +17,7 @@ public:
 	Bat(GSprite* sprite, int posX = 0, int posY = 0);
 	~Bat();
 
-	void Draw() { sprite->Draw(posCur.x, posCur.y); }
+	void Draw() { sprite->Draw((int)posCur.x, (int)posCur.y); }
 	void MoveUp(int speed);
 	void MoveDown(int speed);
 	RECT GetBound();

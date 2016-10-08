@@ -26,7 +26,7 @@ GText::~GText()
 	}
 }
 
-void GText::Draw(LPTSTR lpString, int x, int y, D3DCOLOR color)
+void GText::Draw(LPCSTR lpString, int x, int y, D3DCOLOR color)
 {
 	RECT R = { x, y, 0, 0 };
 	font->DrawTextA(0, lpString, -1, &R, DT_NOCLIP, color);

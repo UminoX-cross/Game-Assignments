@@ -38,8 +38,8 @@ void Ball::Restart()
 	do
 	{
 		srand(time(NULL));
-		velocity.x = -(rand() % 6); // random -10 -> 10
-		velocity.y = -(rand() % 6);
+		velocity.x = -(rand() % 10); // random -10 -> 10
+		velocity.y = -(rand() % 10);
 	} while (velocity.x == 0 || velocity.y == 0);
 }
 

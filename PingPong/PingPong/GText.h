@@ -11,7 +11,7 @@ protected:
 public:
 	GText(LPDIRECT3DDEVICE9 device, std::wstring &name, int width, int height);
 	~GText();
-	void Draw(LPTSTR lpString, int x, int y, D3DCOLOR color);
+	void Draw(LPCSTR lpString, int x, int y, D3DCOLOR color);
 	void Draw(std::string str, int x, int y, D3DCOLOR color);
 };
 

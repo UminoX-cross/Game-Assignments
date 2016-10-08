@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <d3d9.h>
 #include "Global.h"
-#include <dinput.h>
+#include "GInput.h"
 
 class CGame
 {
@@ -25,19 +25,9 @@ protected:
 
 	int InitDirectX();
 
-	void InitKeyboard();
-
-	void ProcessKeyBoard();
-
 	virtual void RenderFrame(LPDIRECT3DDEVICE9 d3ddv, int Delta);
 	virtual void LoadResources(LPDIRECT3DDEVICE9 d3ddv);
-	virtual void ProcessInput(LPDIRECT3DDEVICE9 d3ddv, int Delta);
-	
-	virtual void OnKeyUp(int KeyCode);
-	virtual void OnKeyDown(int KeyCode);
-	virtual void OnKeyPress(int KeyCode);
-
-	int IsKeyDown(int KeyCode);
+	virtual void SetInput();
 
 	void GameDraw(int deltaTime);
 
@@ -45,9 +35,9 @@ protected:
 
 	DWORD _DeltaTime;
 
-	BYTE  _KeyStates[256]; // DirectInput keyboard state buffer 
+	//BYTE  _KeyStates[256]; // DirectInput keyboard state buffer 
 
-	DIDEVICEOBJECTDATA _KeyEvents[ GL_KEY_BUFFER_SIZE ]; // Buffered keyboard data
+	//DIDEVICEOBJECTDATA _KeyEvents[ GL_KEY_BUFFER_SIZE ]; // Buffered keyboard data
 };
 
 #endif

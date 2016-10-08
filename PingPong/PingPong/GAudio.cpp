@@ -37,7 +37,7 @@ GSound* GAudio::LoadSound(char *filename)
     GSound *wave;
 
     //attempt to load the wave file
-    result = dsound->Create(&wave, filename);
+    result = dsound->Create(&wave, (LPTSTR)filename);
     if (result != DS_OK)
     {
 		GLTrace("[Failed] Can not load sound file");

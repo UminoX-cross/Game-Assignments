@@ -1,6 +1,7 @@
 ﻿#include <windows.h>
-#include "Game.h"
 #include <d3d9.h>
+#include <string>
+#include "Game.h"
 
 CGame::CGame(int _nnCmdShow)
 {
@@ -34,13 +35,12 @@ int CGame::InitWindow(int nCmdShow)
 		windowStyle = WS_OVERLAPPEDWINDOW; //dạng cửa sổ
 	}
 
-	G_hWnd = 
-		CreateWindow(
+	G_hWnd = CreateWindow(
 		G_GameName,
 		G_GameName,
 		windowStyle,
 		CW_USEDEFAULT,
-		CW_USEDEFAULT, 
+		CW_USEDEFAULT,
 		G_ScreenWidth,
 		G_ScreenHeight,
 		NULL,
@@ -99,94 +99,15 @@ int CGame::InitDirectX()
 	return 1;
 }
 
-void CGame::InitKeyboard()
-{
-    HRESULT 
-		hr = DirectInput8Create
-			( 
-				GetModuleHandle(NULL), 
-				DIRECTINPUT_VERSION, 
-				IID_IDirectInput8, (VOID**)&G_DirectInput, NULL 
-			);
-
-	// TO-DO: put in exception handling
-	if (FAILED(hr)==true)
-		return;
-	
-	hr = G_DirectInput->CreateDevice(GUID_SysKeyboard, &G_KeyBoard, NULL); 
-	
-	// TO-DO: put in exception handling
-	if (FAILED(hr)==true) 
-		return;
-
-	hr = G_KeyBoard->SetDataFormat(&c_dfDIKeyboard);
-	if (FAILED(hr)==true) 
-		return;
-
-	hr = G_KeyBoard->SetCooperativeLevel(G_hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE); 
-	if (FAILED(hr)==true) 
-		return;
-
-    DIPROPDWORD dipdw;
-
-    dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
-    dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-    dipdw.diph.dwObj        = 0;
-    dipdw.diph.dwHow        = DIPH_DEVICE;
-    dipdw.dwData            = GL_KEY_BUFFER_SIZE;
-
-    hr = G_KeyBoard->SetProperty( DIPROP_BUFFERSIZE, &dipdw.diph );
-	if (FAILED(hr)==true) 
-		return;
-
-	hr = G_KeyBoard->Acquire(); 
-	if (FAILED(hr)==true) 
-		return;
-}
-
 void CGame::InitGame()
 {
 	InitWindow(nCmdShow);
 	InitDirectX();
-	InitKeyboard();
+	InitGInput(G_hWnd);
+	if (!InitKeyboard(G_hWnd))
+		MessageBox(G_hWnd, "Cannot initilalize the keyboard", "Error", MB_OK | MB_ICONERROR);
 	LoadResources(G_Device);
 }
-
-void CGame::ProcessKeyBoard()
-{
-		HRESULT hr = G_KeyBoard->GetDeviceState(sizeof(_KeyStates), (LPVOID)&_KeyStates);
-		if(hr != S_OK)
-		{
-			hr = G_KeyBoard->Acquire();
-			G_KeyBoard->GetDeviceState(sizeof(_KeyStates), (LPVOID)&_KeyStates);
-		}
-		// Collect all key states first
-		G_KeyBoard->GetDeviceState( sizeof(_KeyStates), _KeyStates);
-
-		if (IsKeyDown(DIK_ESCAPE)) 
-		{
-			PostMessage(G_hWnd,WM_QUIT,0,0);
-		}
-
-		// Collect all buffered events
-		DWORD dwElements = GL_KEY_BUFFER_SIZE;
-		hr = G_KeyBoard->GetDeviceData( sizeof(DIDEVICEOBJECTDATA), _KeyEvents, &dwElements, 0 );
-
-		// Scan through all data, check if the key is pressed or released
-		for( DWORD i = 0; i < dwElements; i++ ) 
-		{
-			int KeyCode = _KeyEvents[i].dwOfs;
-			int KeyState = _KeyEvents[i].dwData;
-			if ( (KeyState & 0x80) > 0)
-				OnKeyDown(KeyCode);
-			else 
-				OnKeyUp(KeyCode);
-		}
-}
-
-void CGame::OnKeyUp(int KeyCode) { }
-void CGame::OnKeyDown(int KeyCode)	{ }
-void CGame::OnKeyPress(int KeyCode) { }
 
 void CGame::GameDraw(int deltaTime)
 {
@@ -215,9 +136,9 @@ void CGame::GameRun()
 	DWORD frame_start = GetTickCount();;
 	
 	DWORD tick_per_frame = 100 / G_FrameRate;
-
 	while (!done) 
 	{
+		PollKeyBoard();
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
 			if (msg.message==WM_QUIT) done=1;
@@ -233,12 +154,11 @@ void CGame::GameRun()
 			frame_start = now;
 			RenderFrame();
 		}
-
-		ProcessKeyBoard();
-
-		ProcessInput(G_Device, _DeltaTime);
+		//SetInput();
 	}
 }
+
+void CGame::SetInput() { }
 
 void CGame::RenderFrame()
 {
@@ -259,26 +179,11 @@ void CGame::LoadResources(LPDIRECT3DDEVICE9 d3ddv)
 {
 }
 
-void CGame::ProcessInput(LPDIRECT3DDEVICE9 d3ddv, int Delta) 
-{
-	/*HRESULT hr = G_KeyBoard->GetDeviceState(sizeof(_KeyStates), (LPVOID)&_KeyStates);
-		if(hr != S_OK)
-		{
-			hr = G_KeyBoard->Acquire();
-			G_KeyBoard->GetDeviceState(sizeof(_KeyStates), (LPVOID)&_KeyStates);
-		}*/
-	
-}
-
-int CGame::IsKeyDown(int KeyCode)
-{
-	return (_KeyStates[KeyCode] & 0x80) > 0;
-}
-
 void CGame::GameEnd()
 {
 	if (G_Device!=NULL) G_Device->Release();
 	if (G_DirectX!=NULL) G_DirectX->Release();
+	GInputRelease();
 }
 
 LRESULT CALLBACK CGame::WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

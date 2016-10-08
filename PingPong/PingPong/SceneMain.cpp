@@ -21,16 +21,12 @@ void SceneMain::RenderFrame(LPDIRECT3DDEVICE9 d3ddv, int t)
 	POINT pointColScreen = ball->SetCollideScreenBound(G_ScreenWidth, G_ScreenHeight);
 	CalculateScore(pointColScreen);
 
-//	text->Draw(const_cast<char *>((std::to_string(scorePlayer_1)).c_str()), 100, 50, D3DCOLOR_XRGB(120, 180, 210));
 	text->Draw(std::to_string(scorePlayer_1), 100, 50, D3DCOLOR_XRGB(120, 180, 210));
 	text->Draw(std::to_string(scorePlayer_2), G_ScreenWidth-100, 50, D3DCOLOR_XRGB(120, 180, 210));
 	text->Draw("W-S", 100, 0, D3DCOLOR_XRGB(90, 90, 90));
 	text->Draw("Up-Down", G_ScreenWidth-200, 0, D3DCOLOR_XRGB(90, 90, 90));
-}
 
-void SceneMain::ProcessInput(LPDIRECT3DDEVICE9 d3ddv, int Delta)
-{
-	
+	SetInput();
 }
 
 void SceneMain::LoadResources(LPDIRECT3DDEVICE9 d3ddv)
@@ -61,26 +57,21 @@ void SceneMain::LoadResources(LPDIRECT3DDEVICE9 d3ddv)
 	line = new GSprite(new GTexture("Resources/line.png"), 0);
 }
 
-void SceneMain::OnKeyDown(int KeyCode)
+void SceneMain::SetInput()
 {
-	const int speed = 20;
+	const int speed = 10;
 
 	/// player 1
-	if (KeyCode == DIK_W)
+	if (KeyDown(DIK_W))
 		player_1->MoveUp(speed);
-	if (KeyCode == DIK_S)
+	if (KeyDown(DIK_S))
 		player_1->MoveDown(speed);
 
 	/// player 2
-	if (KeyCode == DIK_UP)
+	if (KeyDown(DIK_UP))
 		player_2->MoveUp(speed);
-	if (KeyCode == DIK_DOWN)
+	if (KeyDown(DIK_DOWN))
 		player_2->MoveDown(speed);
-}
-
-void SceneMain::OnKeyPress(int KeyCode)
-{
-
 }
 
 SceneMain::~SceneMain(void)
